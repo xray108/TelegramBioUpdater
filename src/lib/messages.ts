@@ -2,19 +2,13 @@
 import { nowZoned, diffMs, diffHoursCeil, diffDaysFloor } from './time.js';
 import { Localization, DEFAULT_LOCALIZATION } from '../config/messages.js';
 
-// Предполагаем, что локализация будет передаваться или загружаться глобально
 let currentLocalization: Localization = DEFAULT_LOCALIZATION;
 
 export function setLocalization(loc: Localization) {
   currentLocalization = loc;
 }
 
-export function plural(
-  n: number,
-  one: string,
-  two: string,
-  many: string
-): string {
+export function plural(n: number, one: string, two: string, many: string): string {
   return currentLocalization.plurals(n, one, two, many);
 }
 
@@ -26,9 +20,8 @@ function interpolate(template: string, params: Record<string, any>): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => params[key]);
 }
 
-export function generateMessage(TARGET_DATE: Date): string {
-  const now = nowZoned();
-  const diff = diffMs(TARGET_DATE, now);
+export function generateMessage(TARGET_DATE: Date, base: Date = nowZoned()): string {
+  const diff = diffMs(TARGET_DATE, base);
 
   if (diff < 0) {
     const daysAgo = Math.ceil(Math.abs(diff) / (1000 * 60 * 60 * 24));
@@ -37,9 +30,8 @@ export function generateMessage(TARGET_DATE: Date): string {
     return interpolate(messageTemplate, { days: daysAgo, dayText });
   }
 
-  const days = diffDaysFloor(TARGET_DATE, now);
-  const hoursTotal = diffHoursCeil(TARGET_DATE, now);
-  // const dow = getZonedDayOfWeek(now); // Не используется, можно удалить
+  const days = diffDaysFloor(TARGET_DATE, base);
+  const hoursTotal = diffHoursCeil(TARGET_DATE, base);
 
   if (currentLocalization.milestones[days]) {
     return rnd(currentLocalization.milestones[days]);

@@ -5,6 +5,7 @@ yarn-error.log*
 
 dist/
 logs/
+tmp/
 package-lock.json
 setup.sh
 tg-bio-2@1.0.0
